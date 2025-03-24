@@ -4,12 +4,13 @@
   "description": "an app for developers to connect with each other.",
   "main": "index.js",
   "scripts": {
-    "start" : "node src/app.js",
-    "dev" : "nodemon src/app.js"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
   "author": "Gayatri Singh",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mongoose": "^8.13.0"
   }
 }
