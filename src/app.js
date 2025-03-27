@@ -83,11 +83,11 @@ app.delete("/user", async (req, res) => {
 })
 
 // Update data of user
-app.patch("/user", async(req, res, options) => {
+app.patch("/user", async(req, res) => {
   const userId = req.body.userId;
   const data = req.body;
   try {
-    const user = await User.findByIdAndUpdate({_id : userId}, data, {returnDocument:"before"})
+    const user = await User.findByIdAndUpdate(userId, data, {returnDocument:"before"})
     console.log(user)
     res.send("user updated successfully")
   } catch(err) {
@@ -95,19 +95,19 @@ app.patch("/user", async(req, res, options) => {
   }
  })
 
- app.patch("/user", async (req, res) => {
-  const userEmail = req.body.email; // Extract emailId and update fields
-  const data = req.body;
-  try {
-    const updatedUser = await User.findOneAndUpdate({ emailId: userEmail }, data);
+//  app.patch("/user", async (req, res) => {
+//   const userEmail = req.body.userId; // Extract emailId and update fields
+//   const data = req.body;
+//   try {
+//     const updatedUser = await User.findOneAndUpdate({ emailId: userEmail }, data);
 
-    if (!updatedUser) {
-      return res.status(404).send({ message: "User not found" });
-    }
-  } catch (err) {
-    res.status(500).send({ message: "Something went wrong", error: err.message });
-  }
-});
+//     if (!updatedUser) {
+//       return res.status(404).send({ message: "User not found" });
+//     }
+//   } catch (err) {
+//     res.status(500).send({ message: "Something went wrong", error: err.message });
+//   }
+// });
 
 connectDB()
   .then(() => {
