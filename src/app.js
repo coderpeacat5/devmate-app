@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require('./config/database')
 const User = require("./models/user")
 
+
 const app = express();
 
 app.use(express.json())
@@ -76,24 +77,38 @@ app.delete("/user", async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(userId)
     res.send("user deleted successfully")
-  } 
+  }
   catch (err) {
     res.status(500).send("Something went wrong")
   }
 })
 
 // Update data of user
-app.patch("/user", async(req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
   try {
-    const user = await User.findByIdAndUpdate(userId, data, {returnDocument:"before"})
+    const ALLOWED_UPDATES = ["about", "gender", "age", "skills", "photoUrl", "password"]
+
+    const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATES.includes(k)
+    )
+
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed")
+    }
+
+    if(data.skills?.length > 50) {
+      throw new Error("Skills should not be more than 50")
+    }
+
+    const user = await User.findByIdAndUpdate(userId, data, { returnDocument: "before" , runValidators : true})
     console.log(user)
     res.send("user updated successfully")
-  } catch(err) {
-    res.status(400).send("Something went wrong")
   }
- })
+  catch (err) {
+    res.status(400).send("UPDATE FAILED : " + err.message)
+  }
+})
 
 //  app.patch("/user", async (req, res) => {
 //   const userEmail = req.body.userId; // Extract emailId and update fields
