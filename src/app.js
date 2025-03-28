@@ -3,10 +3,12 @@ const connectDB = require('./config/database')
 const User = require("./models/user");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt")
-
 const app = express();
+const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken")
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.post("/signup", async (req, res) => {
   try {
@@ -24,7 +26,7 @@ app.post("/signup", async (req, res) => {
       firstName,
       lastName,
       emailId,
-      password : passwordHash,
+      password: passwordHash,
       gender,
       age
     })
@@ -39,21 +41,51 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const {emailId, password} = req.body;
+    const { emailId, password } = req.body;
 
-    const user = await User.findOne({emailId : emailId})
-    if(!user) {
-      throw new Error ("Invalid credentials")
+    const user = await User.findOne({ emailId: emailId })
+    if (!user) {
+      throw new Error("Invalid credentials")
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
-    if(isPasswordValid) {
+    if (isPasswordValid) {
+      // Create a JWT token
+      const token = await jwt.sign({ _id: user._id }, "dev@Mate$2300")
+      console.log(token)
+
+      res.cookie('token', token)
       res.send("Login Successful!!")
     } else {
       throw new Error("Invalid credentials")
     }
   }
-  catch(err) {
+  catch (err) {
+    res.status(400).send("ERROR: " + err.message)
+  }
+})
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+    if(!token) {
+      throw new Error("Invalid token")
+    }
+
+    // Validate my token
+    const decodedMessage = await jwt.verify(token, "dev@Mate$2300")
+    console.log(decodedMessage)
+    const { _id } = decodedMessage;
+
+    const user = await User.findById(_id)
+    if(!user) {
+      throw new Error("Please login again")
+    }
+
+    res.send(user)
+  }
+  catch (err) {
     res.status(400).send("ERROR: " + err.message)
   }
 })
