@@ -53,7 +53,6 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl : {
         type: String,
-        default: "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=",
         validate(value) {
             if(!validator.isURL(value)) {
                 throw new Error("Not valid Photo URL: " + value)
@@ -72,6 +71,18 @@ const userSchema = new mongoose.Schema({
     timestamps : true
 }
 )
+
+// Pre-save middleware to set default photo based on gender
+userSchema.pre('save', function (next) {
+    if (!this.photoUrl) {
+        if (this.gender === 'female') {
+            this.photoUrl = "https://p7.hiclipart.com/preview/516/431/747/computer-icons-female-user-profile-female-girl-wife-woman-icon.jpg"
+        } else {
+            this.photoUrl = "https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG.png"
+        }
+    }
+    next();
+})
 
 // Create a JWT token
 userSchema.methods.getJWT = async function() {
