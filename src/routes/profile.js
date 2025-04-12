@@ -19,45 +19,42 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
-    validateEditProfileData(req);
-    if (!validateEditProfileData) {
-      throw new Error("Invalid request")
+    if (!validateEditProfileData(req)) {
+      throw new Error("Invalid Edit Request");
     }
 
     const loggedInUser = req.user;
 
-    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]))
+    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
+
     await loggedInUser.save();
 
     res.json({
-      message: `${loggedInUser.firstName}, your profile was updated successfully!!`,
-      data: loggedInUser
-    }
-    )
+      message: `${loggedInUser.firstName}, your profile updated successfuly`,
+      data: loggedInUser,
+    });
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
   }
-  catch (err) {
-    res.status(400).send("ERROR: " + err.message)
-  }
+});
 
-})
-
-profileRouter.patch("/profile/password", userAuth, async(req, res) => {
-  try{
+profileRouter.patch("/profile/password", userAuth, async (req, res) => {
+  try {
     const user = req.user;
-    
-    const {oldPassword, newPassword} = req.body;
+
+    const { oldPassword, newPassword } = req.body;
 
     // Check if old password is correct
     const isMatch = await bcrypt.compare(oldPassword, user.password)
-    if(!isMatch) {
+    if (!isMatch) {
       throw new Error("Old password is incorrect")
     }
 
     // Validate new password
-    if(!validatePassword(newPassword)) {
+    if (!validatePassword(newPassword)) {
       throw new Error("Please enter a strong password")
     }
-  
+
     // Update new password
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
@@ -65,7 +62,7 @@ profileRouter.patch("/profile/password", userAuth, async(req, res) => {
     res.send("Password changed successfully!!")
 
   }
-  catch(err) {
+  catch (err) {
     res.status(400).send("ERROR: " + err.message)
   }
 })
