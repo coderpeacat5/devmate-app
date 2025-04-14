@@ -24,7 +24,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
             ]
         })
         if (existingConnection) {
-            return res.status("400").send("Connection request already exists!!")
+            return res.status(400).send("Connection request already exists!!")
         }
 
         const toUser = await User.findById(toUserId);
