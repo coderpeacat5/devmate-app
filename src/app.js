@@ -8,8 +8,7 @@ const app = express();
 app.use(cors({
   origin : "http://localhost:5173",
   credentials : true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders : ['Content-Type']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 }))
 
 app.use(express.json())
