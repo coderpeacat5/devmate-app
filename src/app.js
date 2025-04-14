@@ -21,7 +21,7 @@ const userRouter = require("./routes/user")
 app.use("/", authRouter)
 app.use("/", profileRouter)
 app.use("/", requestRouter)
-app.use("/api", userRouter)
+app.use("/", userRouter)
 
 connectDB()
   .then(() => {
